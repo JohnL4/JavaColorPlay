@@ -158,7 +158,11 @@ public class ColorPlay extends Application
         
         planetGradient.addLandColorStop(Color.GREEN, 0.0);
         planetGradient.addLandColorStop(Color.GOLDENROD, 0.25);
+<<<<<<< HEAD
         planetGradient.addLandColorStop(Color.SADDLEBROWN, 0.5);
+=======
+        planetGradient.addLandColorStop(Color.BROWN, 0.5);
+>>>>>>> 095854eccc54cceddcc928751100a9688f564aa6
         planetGradient.addLandColorStop(Color.SLATEGRAY, 0.75);
         planetGradient.addLandColorStop(Color.WHITE, 1.0);
     }
