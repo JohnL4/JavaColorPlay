@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
@@ -93,17 +94,22 @@ public class ColorPlay extends Application
         MenuBar menuBar = makeMenuBar();
         borderPane.setTop(menuBar);
         
-        VBox vbox = new VBox( SPACING);
-        borderPane.setCenter(vbox);
+        VBox outerVBox = new VBox( SPACING);
+        borderPane.setCenter(outerVBox);
         
-        vbox.setFillWidth(false);
-        vbox.setAlignment(Pos.BASELINE_CENTER);
+        outerVBox.setFillWidth(false);
+        outerVBox.setAlignment(Pos.BASELINE_CENTER);
 //        vbox.setHgap(SPACING);
 //        vbox.setVgap(SPACING);
-        vbox.setPadding( new Insets(SPACING));
+        outerVBox.setPadding( new Insets(SPACING));
+        
+        VBox gradientVBox = new VBox();
+        outerVBox.getChildren().add( gradientVBox);
+        gradientVBox.setFillWidth(false);
+        gradientVBox.setAlignment(Pos.BASELINE_CENTER);
         
         gradientHBox = new HBox();
-        vbox.getChildren().add(gradientHBox); // , 0, 0, 2, 1);
+        gradientVBox.getChildren().add(gradientHBox); // , 0, 0, 2, 1);
         gradientHBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, 
                 BorderWidths.DEFAULT)));
         
@@ -124,7 +130,7 @@ public class ColorPlay extends Application
         landGradientRect.setFill(planetGradient.getLandGradient());
         
         thumbPane = new AnchorPane();
-        vbox.getChildren().add( thumbPane);
+        gradientVBox.getChildren().add( thumbPane);
         thumbPane.setPrefHeight(20); // Max. height of a thumb.
         thumbPane.setMinWidth( 600 + 2 * THUMB_PANE_SIZE_OFFSET); // Add max. width of a thumb.
         thumbPane.setBorder( new Border( new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, 
@@ -134,7 +140,7 @@ public class ColorPlay extends Application
         
         // Properties of the current color stop.
         HBox propsBox = new HBox(SPACING);
-        vbox.getChildren().add(propsBox);
+        outerVBox.getChildren().add(propsBox);
         
         ColorPicker cp = new ColorPicker();
         propsBox.getChildren().add(cp); //, 0, 1);
@@ -185,8 +191,41 @@ public class ColorPlay extends Application
     {
         for (ColorStop stop : planetGradient.getWaterColorStops())
         {
-            
+            Shape thumb = makeThumb();
+            thumbPane.getChildren().add(thumb);
+            thumbPane.setLeftAnchor(thumb, 
+                    + stop.getPosition() * (thumbPane.getMinWidth() - 2 * THUMB_PANE_SIZE_OFFSET) / 2
+                    + 0 // Offset for "water" section
+                    + THUMB_PANE_SIZE_OFFSET 
+                    - thumb.getLayoutBounds().getWidth() / 2);
         }
+        for (ColorStop stop : planetGradient.getLandColorStops())
+        {
+            Shape thumb = makeThumb();
+            thumbPane.getChildren().add( thumb);
+            thumbPane.setLeftAnchor( thumb,
+                    + stop.getPosition() * (thumbPane.getMinWidth() - 2 * THUMB_PANE_SIZE_OFFSET) / 2
+                    + (thumbPane.getMinWidth() - 2 * THUMB_PANE_SIZE_OFFSET) / 2 // Offset for "land" section
+                    + THUMB_PANE_SIZE_OFFSET
+                    - thumb.getLayoutBounds().getWidth() / 2);
+        }
+    }
+
+    private Shape makeThumb()
+    {
+        double THUMB_SIDE = 10.0;
+        double thumbHeight = THUMB_SIDE * Math.sin(Math.PI/3);
+        double thumbWidth = THUMB_SIDE;
+        
+        double[] points = new double[] {
+                -thumbWidth/2, thumbHeight,
+                thumbWidth/2, thumbHeight,
+                0.0, 0.0
+        };
+        Polygon retval = new Polygon(points);
+        retval.setFill(Color.GRAY);
+        retval.setStroke(Color.BLACK);
+        return retval;
     }
 
     /**
