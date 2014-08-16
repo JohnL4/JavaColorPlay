@@ -1,13 +1,11 @@
 package com.how_hard_can_it_be.color;
 
-import javax.swing.plaf.basic.BasicToolBarUI.DockingListener;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
@@ -17,18 +15,18 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.ColumnConstraintsBuilder;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -36,8 +34,14 @@ import javafx.stage.Stage;
 
 public class ColorPlay extends Application
 {
-
+    private static double SPACING = 20;
+    private static double THUMB_PANE_SIZE_OFFSET = 10;
+    
     PlanetHeightColorGradient planetGradient;
+
+    private HBox gradientHBox;
+
+    private AnchorPane thumbPane;
     
     /**
      * Provided by {@link Application} -- must override.  Stage is top-level container.  Scene contains content.
@@ -48,7 +52,7 @@ public class ColorPlay extends Application
         // Scene scene = makeButtonScene();
         Scene scene = makeGradientEditorScene();
 
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("ColorPlay");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -89,16 +93,17 @@ public class ColorPlay extends Application
         MenuBar menuBar = makeMenuBar();
         borderPane.setTop(menuBar);
         
-        GridPane grid = new GridPane();
-        borderPane.setCenter(grid);
+        VBox vbox = new VBox( SPACING);
+        borderPane.setCenter(vbox);
         
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding( new Insets(10));
+        vbox.setFillWidth(false);
+        vbox.setAlignment(Pos.BASELINE_CENTER);
+//        vbox.setHgap(SPACING);
+//        vbox.setVgap(SPACING);
+        vbox.setPadding( new Insets(SPACING));
         
-        // Rectangle w/in which gradient will be drawn.
-        HBox gradientHBox = new HBox();
-        grid.add(gradientHBox, 0, 0, 2, 1);
+        gradientHBox = new HBox();
+        vbox.getChildren().add(gradientHBox); // , 0, 0, 2, 1);
         gradientHBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, 
                 BorderWidths.DEFAULT)));
         
@@ -118,19 +123,32 @@ public class ColorPlay extends Application
         waterGradientRect.setFill(planetGradient.getWaterGradient());
         landGradientRect.setFill(planetGradient.getLandGradient());
         
+        thumbPane = new AnchorPane();
+        vbox.getChildren().add( thumbPane);
+        thumbPane.setPrefHeight(20); // Max. height of a thumb.
+        thumbPane.setMinWidth( 600 + 2 * THUMB_PANE_SIZE_OFFSET); // Add max. width of a thumb.
+        thumbPane.setBorder( new Border( new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, 
+                BorderWidths.DEFAULT)));
+        
+        makeThumbs();
+        
+        // Properties of the current color stop.
+        HBox propsBox = new HBox(SPACING);
+        vbox.getChildren().add(propsBox);
+        
         ColorPicker cp = new ColorPicker();
-        grid.add(cp, 0, 1);
+        propsBox.getChildren().add(cp); //, 0, 1);
         
         GridPane rgbGrid = new GridPane();
-        rgbGrid.setHgap(10);
-        rgbGrid.setVgap(10);
-        rgbGrid.setPadding(new Insets(10));
+        rgbGrid.setHgap(SPACING / 2);
+        rgbGrid.setVgap(SPACING / 2);
+//        rgbGrid.setPadding(new Insets(SPACING));
         
         ColumnConstraints cc1 = new ColumnConstraints(60);
         ColumnConstraints cc2 = new ColumnConstraints(50);
         rgbGrid.getColumnConstraints().addAll(cc1, cc2);
         
-        grid.add(rgbGrid, 1, 1);
+        propsBox.getChildren().add(rgbGrid); //, 1, 1);
         
         rgbGrid.add( new Label("Red"), 0, 0);
         rgbGrid.add( new Label("Green"), 0, 1);
@@ -161,6 +179,14 @@ public class ColorPlay extends Application
         planetGradient.addLandColorStop(Color.SADDLEBROWN, 0.5);
         planetGradient.addLandColorStop(Color.SLATEGRAY, 0.75);
         planetGradient.addLandColorStop(Color.WHITE, 1.0);
+    }
+
+    private void makeThumbs()
+    {
+        for (ColorStop stop : planetGradient.getWaterColorStops())
+        {
+            
+        }
     }
 
     /**
@@ -200,7 +226,7 @@ public class ColorPlay extends Application
         loadMI.setOnAction((ActionEvent t)-> { loadFile();});
         saveMI.setOnAction((ActionEvent t)->{saveFile();});
         saveAsMI.setOnAction((ActionEvent t)->{saveFileAs();});
-        quitMI.setOnAction((ActionEvent t) -> { Platform.exit(); });
+        quitMI.setOnAction((ActionEvent t) -> { quit(); /* Platform.exit(); */ });
         
         return retval;
     }
@@ -221,6 +247,12 @@ public class ColorPlay extends Application
     {
         // TODO Auto-generated method stub
         
+    }
+
+    private void quit()
+    {
+        // TODO Auto-generated method stub
+        Platform.exit();
     }
 
     /**

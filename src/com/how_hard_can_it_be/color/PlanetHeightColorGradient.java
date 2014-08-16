@@ -1,8 +1,11 @@
 package com.how_hard_can_it_be.color;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.sun.javafx.UnmodifiableArrayList;
 
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -117,5 +120,15 @@ public class PlanetHeightColorGradient
         }
         paintGradient = new LinearGradient(0,0,1,0,true, CycleMethod.NO_CYCLE, stopsList);
         return paintGradient;
+    }
+
+    public List<ColorStop> getWaterColorStops()
+    {
+        return Collections.unmodifiableList(waterColorStops);
+    }
+
+    public List<ColorStop> getLandColorStops()
+    {
+        return Collections.unmodifiableList(landColorStops);
     }
 }
